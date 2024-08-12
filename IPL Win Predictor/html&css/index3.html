@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Prediction</title>
+    <link rel="stylesheet" href="styles2.css">
+</head>
+<body>
+    <div class="container">
+        <img src="cricket background.jpg" alt="Background" class="background">
+        <div class="form-container">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="batting-team">Select Batting Team</label>
+                    <select id="batting-team">
+                        <option>Chennai Super Kings</option>
+                        <option>Mumbai Indians</option>
+                        <option>Royal Challengers Bangalore</option>
+                        <option>Kolkata Knight Riders</option>
+                        <!-- Add more teams as needed -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bowling-team">Select Bowling Team</label>
+                    <select id="bowling-team">
+                        <option>Mumbai Indians</option>
+                        <option>Chennai Super Kings</option>
+                        <option>Royal Challengers Bangalore</option>
+                        <option>Kolkata Knight Riders</option>
+                        <!-- Add more teams as needed -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="venue">Select Venue</label>
+                <select id="venue">
+                    <option>Eden Garden</option>
+                    <option>Wankhede Stadium</option>
+                    <option>M. Chinnaswamy Stadium</option>
+                    <option>Feroz Shah Kotla Ground</option>
+                    <!-- Add more venues as needed -->
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="current-over">Current Over</label>
+                    <input type="number" id="current-over" placeholder="Enter Current Over">
+                </div>
+                <div class="form-group">
+                    <label for="current-runs">Current Runs</label>
+                    <input type="number" id="current-runs" placeholder="Enter Current Runs">
+                </div>
+                <div class="form-group">
+                    <label for="wickets-fallen">Wickets Fallen</label>
+                    <input type="number" id="wickets-fallen" placeholder="Enter Wickets Fallen">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="runs-last-5">Runs Scored in Last 5 Overs</label>
+                    <input type="number" id="runs-last-5" placeholder="Enter Runs Scored in Last 5 Overs">
+                </div>
+                <div class="form-group">
+                    <label for="wickets-last-5">Wickets Taken in Last 5 Overs</label>
+                    <input type="number" id="wickets-last-5" placeholder="Enter Wickets Taken in Last 5 Overs">
+                </div>
+            </div>
+
+            <button class="predict-btn" onclick="predictMatchScore()">Predict Match Score</button>
+
+            <div id="result" class="result" style="display: none;">
+                <p id="predicted-score">Predicted Match Score: <span>200</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

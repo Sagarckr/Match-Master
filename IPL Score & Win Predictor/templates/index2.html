@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victory Predictor</title>
+    <link rel="stylesheet" href="/static/styles2.css">
+</head>
+<body>
+    <div class="container">
+        <img src="/static/cricket background.jpg" alt="Background" class="background">
+        <div class="form-container">
+            <form id="cricketPredictionForm" method="POST">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="batting_team">Select Batting Team</label>
+                        <select id="batting_team" name="batting_team">
+                            <option value="">Select Team</option>
+                            {% for team in teams %}
+                            <option value="{{ team }}" {% if form_data.batting_team == team %} selected {% endif %}>
+                                {{ team }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bowling_team">Select Bowling Team</label>
+                        <select id="bowling_team" name="bowling_team">
+                            <option value="">Select Team</option>
+                            {% for team in teams %}
+                            <option value="{{ team }}" {% if form_data.bowling_team == team %} selected {% endif %}>
+                                {{ team }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="city">Select Venue</label>
+                    <select id="city" name="city">
+                        <option value="">Select Venue</option>
+                        {% for city in cities %}
+                        <option value="{{ city }}" {% if form_data.city == city %} selected {% endif %}>
+                            {{ city }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="total_score">Target</label>
+                    <input type="number" id="total_score" name="total_score" placeholder="Enter Target" value="{{ form_data.total_score }}">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="current_score">Score</label>
+                        <input type="number" id="current_score" name="current_score" placeholder="Enter Score" value="{{ form_data.current_score }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="overs">Current Over</label>
+                        <input type="number" id="overs" name="overs" placeholder="Enter Current Over" step="0.1" value="{{ form_data.overs }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="wickets">Wickets Down</label>
+                        <input type="number" id="wickets" name="wickets" placeholder="Enter Wickets Down" value="{{ form_data.wickets }}">
+                    </div>
+                </div>
+
+                <button type="submit" class="predict-btn">Predict Winning Probability</button>
+
+                {% if batting_team_prob is not none and bowling_team_prob is not none %}
+                <div id="result" class="result">
+                    <p>{{ form_data.batting_team }} Winning Probability: <span>{{ batting_team_prob }}%</span></p>
+                    <p>{{ form_data.bowling_team }} Winning Probability: <span>{{ bowling_team_prob }}%</span></p>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const battingTeamSelect = document.getElementById('batting_team');
+            const bowlingTeamSelect = document.getElementById('bowling_team');
+
+            battingTeamSelect.addEventListener('change', function() {
+                const selectedBattingTeam = this.value;
+                const options = bowlingTeamSelect.options;
+
+                for (let i = 0; i < options.length; i++) {
+                    options[i].disabled = options[i].value === selectedBattingTeam;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

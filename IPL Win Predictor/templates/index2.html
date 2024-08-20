@@ -79,5 +79,22 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.getElementById('batting_team').addEventListener('change', function() {
+            var battingTeam = this.value;
+            var bowlingTeamSelect = document.getElementById('bowling_team');
+            var options = bowlingTeamSelect.getElementsByTagName('option');
+            
+            for (var i = 0; i < options.length; i++) {
+                options[i].disabled = (options[i].value === battingTeam);
+            }
+
+            // Reset the bowling team selection if the previously selected team is now disabled
+            if (bowlingTeamSelect.value === battingTeam) {
+                bowlingTeamSelect.value = '';
+            }
+        });
+    </script>
 </body>
 </html>

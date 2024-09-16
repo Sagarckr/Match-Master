@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Victory Predictor</title>
     <link rel="stylesheet" href="/static/styles2.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js -->
 </head>
+
 <body>
     <div class="container">
         <img src="/static/cricket background.jpg" alt="Background" class="background">
@@ -17,7 +20,7 @@
                         <select id="batting_team" name="batting_team">
                             <option value="">Select Team</option>
                             {% for team in teams %}
-                            <option value="{{ team }}" {% if form_data.batting_team == team %} selected {% endif %}>
+                            <option value="{{ team }}" {% if form_data.batting_team==team %} selected {% endif %}>
                                 {{ team }}
                             </option>
                             {% endfor %}
@@ -28,7 +31,7 @@
                         <select id="bowling_team" name="bowling_team">
                             <option value="">Select Team</option>
                             {% for team in teams %}
-                            <option value="{{ team }}" {% if form_data.bowling_team == team %} selected {% endif %}>
+                            <option value="{{ team }}" {% if form_data.bowling_team==team %} selected {% endif %}>
                                 {{ team }}
                             </option>
                             {% endfor %}
@@ -41,7 +44,7 @@
                     <select id="city" name="city">
                         <option value="">Select Venue</option>
                         {% for city in cities %}
-                        <option value="{{ city }}" {% if form_data.city == city %} selected {% endif %}>
+                        <option value="{{ city }}" {% if form_data.city==city %} selected {% endif %}>
                             {{ city }}
                         </option>
                         {% endfor %}
@@ -50,21 +53,25 @@
 
                 <div class="form-group">
                     <label for="total_score">Target</label>
-                    <input type="number" id="total_score" name="total_score" placeholder="Enter Target" value="{{ form_data.total_score }}">
+                    <input type="number" id="total_score" name="total_score" placeholder="Enter Target"
+                        value="{{ form_data.total_score }}">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="current_score">Score</label>
-                        <input type="number" id="current_score" name="current_score" placeholder="Enter Score" value="{{ form_data.current_score }}">
+                        <input type="number" id="current_score" name="current_score" placeholder="Enter Score"
+                            value="{{ form_data.current_score }}">
                     </div>
                     <div class="form-group">
                         <label for="overs">Current Over</label>
-                        <input type="number" id="overs" name="overs" placeholder="Enter Current Over" step="0.1" value="{{ form_data.overs }}">
+                        <input type="number" id="overs" name="overs" placeholder="Enter Current Over" step="0.1"
+                            value="{{ form_data.overs }}">
                     </div>
                     <div class="form-group">
                         <label for="wickets">Wickets Down</label>
-                        <input type="number" id="wickets" name="wickets" placeholder="Enter Wickets Down" value="{{ form_data.wickets }}">
+                        <input type="number" id="wickets" name="wickets" placeholder="Enter Wickets Down"
+                            value="{{ form_data.wickets }}">
                     </div>
                 </div>
 
@@ -75,17 +82,26 @@
                     <p>{{ form_data.batting_team }} Winning Probability: <span>{{ batting_team_prob }}%</span></p>
                     <p>{{ form_data.bowling_team }} Winning Probability: <span>{{ bowling_team_prob }}%</span></p>
                 </div>
+
+                <!-- View Chart Button -->
+                <button type="button" class="predict-btn view-chart" onclick="displayChart()">View Chart</button>
+
+                <!-- Div for Chart -->
+                <div class="chart-container" id="chart-container" style="display: none;">
+                    <canvas id="winningProbabilityChart"></canvas>
+                    <button class="close-btn" onclick="closeChart()">Close</button>
+                </div>
                 {% endif %}
             </form>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const battingTeamSelect = document.getElementById('batting_team');
             const bowlingTeamSelect = document.getElementById('bowling_team');
 
-            battingTeamSelect.addEventListener('change', function() {
+            battingTeamSelect.addEventListener('change', function () {
                 const selectedBattingTeam = this.value;
                 const options = bowlingTeamSelect.options;
 
@@ -94,6 +110,61 @@
                 }
             });
         });
+
+        function displayChart() {
+            const chartContainer = document.getElementById('chart-container');
+            chartContainer.style.display = 'block';
+            const ctx = document.getElementById('winningProbabilityChart').getContext('2d');
+
+            // Toggle chart container visibility
+            chartContainer.style.display = 'block';
+
+            // Clear the canvas before drawing a new chart
+            if (window.chartInstance) {
+                window.chartInstance.destroy();
+            }
+
+            // Data from Flask
+            const battingTeamProb = {{ batting_team_prob | default (0)}};
+            const bowlingTeamProb = {{ bowling_team_prob | default (0)}};
+            const battingTeam = "{{ form_data.batting_team }}";
+            const bowlingTeam = "{{ form_data.bowling_team }}";
+
+        // Create a pie chart
+        window.chartInstance = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: [battingTeam, bowlingTeam],
+                datasets: [{
+                    data: [battingTeamProb, bowlingTeamProb],
+                    backgroundColor: ['#ffcc00', '#00ccff'], // Colors for each team
+                    hoverBackgroundColor: ['#ffa500', '#0099cc']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        }
+
+        function closeChart() {
+            const chartContainer = document.getElementById('chart-container');
+            chartContainer.style.display = 'none';
+        }
+
     </script>
 </body>
+
 </html>

@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Score Predictor</title>
     <link rel="stylesheet" href="/static/styles3.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js -->
 </head>
+
 <body>
     <div class="container">
         <img src="/static/cricket background.jpg" alt="Background" class="background">
@@ -17,7 +20,7 @@
                         <select id="batting_team" name="batting_team">
                             <option value="">Select Team</option>
                             {% for team in teams %}
-                            <option value="{{ team }}" {% if form_data.batting_team == team %} selected {% endif %}>
+                            <option value="{{ team }}" {% if form_data.batting_team==team %} selected {% endif %}>
                                 {{ team }}
                             </option>
                             {% endfor %}
@@ -28,7 +31,7 @@
                         <select id="bowling_team" name="bowling_team">
                             <option value="">Select Team</option>
                             {% for team in teams %}
-                            <option value="{{ team }}" {% if form_data.bowling_team == team %} selected {% endif %}>
+                            <option value="{{ team }}" {% if form_data.bowling_team==team %} selected {% endif %}>
                                 {{ team }}
                             </option>
                             {% endfor %}
@@ -41,7 +44,7 @@
                     <select id="city" name="city">
                         <option value="">Select Venue</option>
                         {% for city in cities %}
-                        <option value="{{ city }}" {% if form_data.city == city %} selected {% endif %}>
+                        <option value="{{ city }}" {% if form_data.city==city %} selected {% endif %}>
                             {{ city }}
                         </option>
                         {% endfor %}
@@ -51,26 +54,31 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="current_score">Current Score</label>
-                        <input type="number" id="current_score" name="current_score" placeholder="Enter Current Score" value="{{ form_data.current_score }}">
+                        <input type="number" id="current_score" name="current_score" placeholder="Enter Current Score"
+                            value="{{ form_data.current_score }}">
                     </div>
                     <div class="form-group">
                         <label for="overs">Current Over</label>
-                        <input type="number" id="overs" name="overs" placeholder="Enter Current Over" step="0.1" value="{{ form_data.overs }}">
+                        <input type="number" id="overs" name="overs" placeholder="Enter Current Over" step="0.1"
+                            value="{{ form_data.overs }}">
                     </div>
                     <div class="form-group">
                         <label for="wickets">Wickets Down</label>
-                        <input type="number" id="wickets" name="wickets" placeholder="Enter Wickets Down" value="{{ form_data.wickets }}">
+                        <input type="number" id="wickets" name="wickets" placeholder="Enter Wickets Down"
+                            value="{{ form_data.wickets }}">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="last_five_over_score">Last 5 Overs Score</label>
-                        <input type="number" id="last_five_over_score" name="last_five_over_score" placeholder="Enter Last 5 Overs Score" value="{{ form_data.last_five_over_score }}">
+                        <input type="number" id="last_five_over_score" name="last_five_over_score"
+                            placeholder="Enter Last 5 Overs Score" value="{{ form_data.last_five_over_score }}">
                     </div>
                     <div class="form-group">
                         <label for="last_five_over_wicket">Last 5 Overs Wickets</label>
-                        <input type="number" id="last_five_over_wicket" name="last_five_over_wicket" placeholder="Enter Last 5 Overs Wickets" value="{{ form_data.last_five_over_wicket }}">
+                        <input type="number" id="last_five_over_wicket" name="last_five_over_wicket"
+                            placeholder="Enter Last 5 Overs Wickets" value="{{ form_data.last_five_over_wicket }}">
                     </div>
                 </div>
 
@@ -80,17 +88,26 @@
                 <div id="result" class="result">
                     <p>Predicted Score: <span>{{ prediction }}</span></p>
                 </div>
+
+                <!-- View Chart Button -->
+                <button type="button" class="predict-btn view-chart" onclick="displayScoreChart()">View Score Chart</button>
+
+                <!-- Div for Score Chart -->
+                <div class="chart-container" id="score-chart-container" style="display: none;">
+                    <canvas id="scorePredictionChart"></canvas>
+                    <button class="close-btn" onclick="closeScoreChart()">Close</button>
+                </div>
                 {% endif %}
             </form>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const battingTeamSelect = document.getElementById('batting_team');
             const bowlingTeamSelect = document.getElementById('bowling_team');
 
-            battingTeamSelect.addEventListener('change', function() {
+            battingTeamSelect.addEventListener('change', function () {
                 const selectedBattingTeam = this.value;
                 const options = bowlingTeamSelect.options;
 
@@ -99,6 +116,70 @@
                 }
             });
         });
+
+        function displayScoreChart() {
+            const chartContainer = document.getElementById('score-chart-container');
+            chartContainer.style.display = 'block';
+            const ctx = document.getElementById('scorePredictionChart').getContext('2d');
+
+            // Toggle chart container visibility
+            chartContainer.style.display = 'block';
+
+            // Clear the canvas before drawing a new chart
+            if (window.scoreChartInstance) {
+                window.scoreChartInstance.destroy();
+            }
+
+            // Data from Flask
+            const currentScore = {{ form_data.current_score | default (0)
+        }};
+        const currentOver = {{ form_data.overs | default (0) }};
+        const wicketsDown = {{ form_data.wickets | default (0) }};
+        const lastFiveOversScore = {{ form_data.last_five_over_score | default (0) }};
+        const lastFiveOversWickets = {{ form_data.last_five_over_wicket | default (0) }};
+        const predictedScore = {{ prediction | default (0) }};
+
+        // Create a bar chart
+        window.scoreChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Current Over', 'Current Score', 'Wickets Down', 'Last 5 Overs Score', 'Last 5 Overs Wickets', 'Predicted Score'],
+                datasets: [{
+                    label: 'Score Prediction',
+                    data: [currentOver, currentScore, wicketsDown, lastFiveOversScore, lastFiveOversWickets, predictedScore],
+                    backgroundColor: ['#ffcc00', '#ff6699', '#00ccff', '#66ff66','#ff9999', '#3399ff'],
+                    borderColor: ['#ffcc00', '#ff6699', '#00ccff', '#66ff66', '#ff9999', '#3399ff',],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        }
+
+        function closeScoreChart() {
+            const chartContainer = document.getElementById('score-chart-container');
+            chartContainer.style.display = 'none';
+        }
     </script>
 </body>
+
 </html>

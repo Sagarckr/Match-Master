@@ -82,6 +82,16 @@ body {
     transform: scale(1.05);
 }
 
+.predict-btn.view-chart {
+    background-color: #00ccff; /* Background color for View Chart button */
+    color: #fff; /* Text color */
+}
+
+.predict-btn.view-chart:hover {
+    background-color: #0099cc; /* Hover background color for View Chart button */
+    transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
 .result {
     margin-top: 20px;
     color: #fff;
@@ -91,3 +101,42 @@ body {
 .result span {
     font-weight: bold;
 }
+
+.chart-container {
+    position: fixed; /* Make the chart container fixed */
+    top: 50%; /* Center the chart container vertically */
+    left: 50%; /* Center the chart container horizontally */
+    transform: translate(-50%, -50%); /* Adjust the position to center */
+    z-index: 1000; /* Make sure the chart container is on top of other elements */
+    background-color: #fff; /* Set background color to white */
+    border: 1px solid #ddd; /* Add border to chart container */
+    border-radius: 20px; /* Add rounded corners to chart container */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow to chart container */
+    padding: 20px; /* Add padding to chart container */
+    width: 900px; /* Set the width of the chart container */
+    height: 700px; /* Set the height of the chart container */
+  }
+  
+  #winningProbabilityChart {
+    width: 100%; /* Make the chart take up the full width of the container */
+    height: 200px; /* Set the height of the chart */
+    margin: 10px auto; /* Add margin to the chart */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow with horizontal offset, vertical offset, blur radius, and color */
+    border-radius: 8px; /* Optional: Add rounded corners to the chart */
+}
+
+  .close-btn {
+    position: absolute; /* Make the close button absolute */
+    top: 10px; /* Position the close button at the top */
+    right: 10px; /* Position the close button at the right */
+    color: #fff; /* White text */
+    background-color: #f44336; /* Red background color */
+    border: none; /* Remove border */
+    padding: 5px 10px; /* Add padding to the close button */
+    font-size: 16px; /* Set font size */
+    cursor: pointer; /* Make the close button clickable */
+  }
+  
+  .close-btn:hover {
+    background-color: #d32f2f; /* Darker red on hover for effect */
+  }
